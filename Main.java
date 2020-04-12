@@ -64,64 +64,72 @@ public class Main {
 	}  
 //---------------------------------------------------------------------------------------------	 	
 	static String add() {
-		ArrayList<String> arrValues = new ArrayList<String>();
-		
-		System.out.println("Please enter name, start date, end date and price (press Enter after each entry): ");
 		Scanner scan = new Scanner(System.in);
-		for (int i = 0 ; i < 4; i++) {
-			 arrValues.add(scan.nextLine());
+	     
+		 LinkedHashMap<String, String> rows = new LinkedHashMap<String, String>(4);
+		 String column;
+		 boolean check = false;
+	     rows.put("customer", " ");
+	     rows.put("date_start", "0"); 
+	     rows.put("date_end", "0");
+	     rows.put("price", "0");
+	     Set set = rows.entrySet();
+	     
+	     
+	    while(!check) { 
+	    	Iterator i = set.iterator();
+		while (i.hasNext()) {
+			Map.Entry me = (Map.Entry)i.next();
+			column = (String)me.getKey();
+			System.out.print("New "+column + ": ");
+			rows.put(column, scan.nextLine());
 		}
-		String customer = arrValues.get(0);
-		int date_start = Integer.parseInt(arrValues.get(1));
-		int date_end = Integer.parseInt(arrValues.get(2));
-		Double price = Double.parseDouble(arrValues.get(3));
-		String values = "\""+customer+"\""+ ", " + date_start+ ", " + date_end+", " + price;
+		check = check(rows);
+	    }
+		
+		String values = "\""+rows.get("customer")+"\""+ ", " + rows.get("date_start")+ ", " + rows.get("date_end")+", " + rows.get("price");
 		String add = "INSERT INTO contract (customer, date_start, date_end, price)"
 				+ "VALUES" + "(" + values + ")" +";";
 		return add;
 	}
 //---------------------------------------------------------------------------------------------	 
 	static String edit() {
-		 ArrayList<String> arrValues = new ArrayList<String>() {{add("0");add("0");add("0");}};
-		 String update = "";
+		 LinkedHashMap<String, String> rows = new LinkedHashMap<String, String>(4);
 		 Scanner scan = new Scanner(System.in);
-		 boolean check = false;
+		 String update = "";
+		 int id = 0;
 		 System.out.println("Please enter the number of the row, column you want to change and the new value (press Enter after each entry): ");
+		
+		 String column = "", value;
+		 boolean check = false;
+	     rows.put("customer", " ");
+	     rows.put("date_start", "0"); 
+	     rows.put("date_end", "0");
+	     rows.put("price", "0");
+	     Set set = rows.entrySet();
 		 
 		 while(!check){
 			 
-			 for (int i = 0 ; i < 3; i++) 
-				arrValues.set(i, scan.nextLine());
+			 System.out.println("# of the row to edit: ");
+			 id = scan.nextInt();
+			 System.out.println("Column to edit: ");
+			 scan.nextLine();
+			 column = scan.nextLine();
+			 System.out.println("New value: ");
+			 value = scan.nextLine();
 			 
-		 
-		 int id = Integer.parseInt(arrValues.get(0));
-		 String column = arrValues.get(1);
-		 if(column.equals("customer")) {
-			  String value = arrValues.get(2);
-			  update = "UPDATE contract SET "+ column+" = "
-				 	   +"\""+value +"\""+" WHERE id = " 
-				 	   + id + ";";	
-			  check = true;
-		 } else if(column.equals("date_start") || column.equals("date_end")) {
-			 int value = Integer.parseInt(arrValues.get(2));
-			  update = "UPDATE contract SET "+ column+" = "
-				 	   +"\""+ value +"\""+" WHERE id = " 
-				 	   + id + ";";	
-			  check = true;
-		 } else if(column.equals("price")) {
-			 double value = Double.parseDouble(arrValues.get(2));
-			 update = "UPDATE contract SET "+ column+" = "
-				 	   +"\""+ value +"\""+" WHERE id = " 
-				 	   + id + ";";
-			 check = true;
-		 } else System.out.println("Please enter a valid column/value");
+			 rows.put(column, value);
+			 
+			 check = check(rows);
 	   }
+		 update = "UPDATE contract SET "+ column +" = "
+			 	   +"\""+ rows.get(column) +"\""+" WHERE id = " 
+			 	   + id + ";";	
 	   return update;
 	 }
 	
 //---------------------------------------------------------------------------------------------	
 	static String delete() {
-//		 ArrayList<String> arrValues = new ArrayList<String>();
 		 Scanner scan = new Scanner(System.in);
 		 System.out.println("Please enter the number of the row you want to delete: ");
 		 
@@ -131,18 +139,40 @@ public class Main {
 		 
 		 return delete;
 	 }
-
-//private class EditValues {
-//	int id = 0;
-//	String column = "0";
-//	
-//	EditValues(int id, String column){
-//		this.id = id;
-//		this.column = column;
-//	}		
-//	
-//}
-
+//---------------------------------------------------------------------------------------------	
+	static boolean check(LinkedHashMap<String,String> lhm) {
+		boolean check = true;
+		for(String key : lhm.keySet()) {
+			switch(key) {
+			case "date_start":
+				try {
+					int i = Integer.parseInt(lhm.get(key));
+				} catch(NumberFormatException e) {
+					System.out.println("Please enter a valid start date value.");
+					check = false;
+				}
+				break;
+			case "date_end":
+				try {
+					int i = Integer.parseInt(lhm.get(key));
+				} catch(NumberFormatException e) {
+					System.out.println("Please enter a valid end date value.");
+					check = false;
+				}
+				break;
+			case "price":
+				try {
+					double d = Double.parseDouble(lhm.get(key));
+				} catch(NumberFormatException e) {
+					System.out.println("Please enter a valid price value.");
+					check = false;
+				}
+				break;
+			}
+		}
+		return check;
+	}
+	
+	
 }
-
 
